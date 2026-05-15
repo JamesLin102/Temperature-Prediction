@@ -1,0 +1,25 @@
+# Dataset registry. All paths are relative to revised_framework_v2/.
+lookback: 5
+n_splits: 10
+shuffle: false
+
+datasets:
+  seattle:
+    raw_csv: data/seattle/seattle-weather.csv
+    kfold_dir: data/seattle
+    has_legacy_assets: true
+    date_col: date
+    targets: [temp_max, temp_min]
+    multivariate_features: [temp_max, temp_min, precipitation, wind]
+    optional_categorical: weather
+
+  seoul:
+    raw_csv: data/seoul/Bias_correction_ucl.csv
+    kfold_dir: data/seoul
+    has_legacy_assets: false
+    date_col: Date
+    station_col: station
+    target_map:
+      Next_Tmax: temp_max
+      Next_Tmin: temp_min
+    targets: [temp_max, temp_min]

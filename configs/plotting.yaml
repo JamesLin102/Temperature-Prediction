@@ -1,0 +1,41 @@
+# Legacy plot style and figure naming (ported from Original Programe/{predict,plot}.py).
+matplotlib_backend: Agg
+figure_dpi: 150
+
+# Residual colour bins from predict.py: |R| <= 2.5, 2.5 < |R| <= 5, |R| > 5.
+residual_thresholds: [2.5, 5]
+colors:
+  bin1: royalblue
+  bin2: yellowgreen
+  bin3: orange
+  diagonal: r
+  hist: g
+
+pred_figsize: [7, 5]
+residual_figsize: [7, 5]
+comparison_figsize: [15, 8]
+hist_bins: 60
+
+# Legacy figure names per workflow (spec section 8.4).
+workflow_figure_names:
+  TCN:
+    pred: TCN_pred.png
+    resi: TCN_resi.png
+  TCN + CTGAN:
+    pred: TCN_CTGAN_pred.png
+    resi: TCN_CTGAN_resi.png
+  TCN + CTGAN (processed):
+    pred: TCN_CTGAN_processed_pred.png
+    resi: TCN_CTGAN_processed_resi.png
+
+# Algorithm comparison line plot slices (from plot.py).
+comparison_slices:
+  - start: 100
+    end: 200
+    title: "Comparison of Algorithms from 2012/4/9~2012/7/18"
+    filename: "演算法比較1.png"
+  - start: 500
+    end: 600
+    title: "Comparison of Algorithms from 2013/5/14~2013/8/22"
+    filename: "演算法比較2.png"
+comparison_xlim: [0, 100]

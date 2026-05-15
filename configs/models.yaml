@@ -1,0 +1,55 @@
+# Per-model hyperparameters. seed mirrors the original tf.random.set_seed(7).
+seed: 7
+
+models:
+  # PyTorch TCN reproducing the original Keras TCN(25) + Dense(1).
+  tcn:
+    hidden_size: 25
+    kernel_size: 2
+    num_levels: 4
+    dropout: 0.0
+    epochs: 5
+    batch_size: 100
+    learning_rate: 0.001
+
+  # LSTM / GRU baselines (no original reference; sized to match TCN capacity).
+  lstm:
+    hidden_size: 25
+    num_layers: 1
+    dropout: 0.0
+    epochs: 10
+    batch_size: 100
+    learning_rate: 0.001
+  gru:
+    hidden_size: 25
+    num_layers: 1
+    dropout: 0.0
+    epochs: 10
+    batch_size: 100
+    learning_rate: 0.001
+
+  svr:
+    kernel: rbf
+    C: 0.04
+    epsilon: 2.0
+    gamma: scale
+  random_forest:
+    n_estimators: 10
+    max_depth: 2
+    random_state: 7
+  lightgbm:
+    n_estimators: 10
+    learning_rate: 0.1
+    num_leaves: 4
+    max_depth: 2
+    random_state: 7
+    verbose: -1
+  arima:
+    order: [4, 2, 0]
+    trend: 'n'
+
+# CTGAN settings for the new-dataset asset generator (mirrors Original Programe/data_gan.py).
+ctgan:
+  epochs: 500
+  num_samples: 1400
+  enforce_min_max_values: true

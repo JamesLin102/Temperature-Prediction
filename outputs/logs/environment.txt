@@ -1,0 +1,23 @@
+Generated:  2026-05-15T19:18:08
+Platform:   Windows-11-10.0.26200-SP0
+Python:     3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:05:38) [MSC v.1929 64 bit (AMD64)]
+Executable: C:\Users\user\anaconda3\envs\tempPrediction\python.exe
+
+Package versions:
+  numpy        2.3.1
+  pandas       3.0.3
+  scipy        1.16.0
+  sklearn      1.8.0
+  torch        2.11.0+cu128
+  lightgbm     4.6.0
+  statsmodels  0.14.6
+  pmdarima     2.1.1
+  sdv          1.36.1
+  ctgan        0.12.1
+  matplotlib   3.10.9
+  yaml         6.0.3
+
+Run info:
+  experiment: all
+  smoke: False
+  dataset: seattle
