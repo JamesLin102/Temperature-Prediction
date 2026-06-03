@@ -28,3 +28,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Local result backups (kept on disk, never pushed)
+_committed_backup_*.zip

@@ -71,8 +71,7 @@ def run(
                 agg = aggregate_folds(fold_results)
                 summary_rows.append(
                     summary_row(
-                        {"dataset": dataset, "target": target, "model": model_name},
-                        agg.per_fold_metrics,
+                        {"dataset": dataset, "target": target, "model": model_name}, agg
                     )
                 )
                 log.info(

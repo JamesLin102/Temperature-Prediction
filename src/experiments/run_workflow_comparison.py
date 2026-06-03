@@ -1,8 +1,9 @@
 """Experiment 7.1 — workflow comparison.
 
 datasets x targets x {TCN, TCN + CTGAN, TCN + CTGAN (processed)}. Reads pre-split
-legacy ``.npy`` folds; a dataset with no assets (new_dataset this pass) is skipped
-gracefully. Seattle additionally gets the legacy figure set.
+legacy ``.npy`` folds; a dataset with no assets is skipped gracefully. Per-fold
+predictions and the aggregated ``.npy`` arrays are saved; the prediction figures
+are drawn afterwards from those arrays by ``src.plotting.figures``.
 """
 from __future__ import annotations
 
@@ -10,7 +11,6 @@ from ..data.dataset_loader import fold_assets_available
 from ..evaluation.aggregator import aggregate_folds, legacy_array_prefix
 from ..evaluation.export_predictions import save_aggregated_arrays, write_fold_predictions
 from ..evaluation.summary_tables import summary_row, write_summary
-from ..plotting.figure_exporter import export_comparison_figures, export_workflow_figures
 from ..utils.logger import get_logger
 from .fold_runner import run_fold
 
@@ -59,8 +59,6 @@ def run(
                 log.warning("Skipping %s/%s: KFold .npy assets not generated.", dataset, target)
                 continue
 
-            arrays_by_workflow: dict = {}
-            arrays_by_prefix: dict = {}
             for workflow in workflows:
                 slug = _WORKFLOW_SLUG[workflow]
                 prefix = legacy_array_prefix(workflow)
@@ -80,25 +78,14 @@ def run(
                     agg.y_true_all, agg.y_pred_all, dataset, target, slug, prefix,
                     outputs_dir=outputs_dir,
                 )
-                arrays_by_workflow[workflow] = (agg.y_true_all, agg.y_pred_all)
-                arrays_by_prefix[prefix] = (agg.y_true_all, agg.y_pred_all)
                 summary_rows.append(
                     summary_row(
-                        {"dataset": dataset, "target": target, "workflow": workflow},
-                        agg.per_fold_metrics,
+                        {"dataset": dataset, "target": target, "workflow": workflow}, agg
                     )
                 )
                 log.info(
                     "workflow=%-26s dataset=%-11s target=%-9s folds=%d MAE=%.4f",
                     workflow, dataset, target, len(fold_results), agg.overall_metrics["MAE"],
-                )
-
-            if dataset == "seattle" and {"T", "TC", "TCP"}.issubset(arrays_by_prefix):
-                export_workflow_figures(
-                    dataset, target, arrays_by_workflow, configs["plotting"], outputs_dir=outputs_dir
-                )
-                export_comparison_figures(
-                    dataset, target, arrays_by_prefix, configs["plotting"], outputs_dir=outputs_dir
                 )
 
     write_summary(summary_rows, "workflow_comparison_summary.csv", outputs_dir=outputs_dir)

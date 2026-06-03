@@ -24,5 +24,4 @@ def load_all_configs() -> dict:
         "datasets": load_config("datasets"),
         "models": load_config("models"),
         "experiments": load_config("experiments"),
-        "plotting": load_config("plotting"),
     }

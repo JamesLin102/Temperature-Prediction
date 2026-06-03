@@ -117,7 +117,7 @@ def run(
                         "setting": name,
                         "use_weather": use_weather,
                     },
-                    agg.per_fold_metrics,
+                    agg,
                 )
             )
             log.info(
