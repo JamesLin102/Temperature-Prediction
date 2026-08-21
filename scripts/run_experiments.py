@@ -1,4 +1,4 @@
-"""Entry point: run one or all revised_framework_v2 experiments, then draw figures.
+"""Entry point: run one or all experiments, then draw the publication figures.
 
     python scripts/run_experiments.py --experiment all
     python scripts/run_experiments.py --experiment workflow
@@ -66,7 +66,9 @@ def _write_merged(saved_rows: list, new_rows: list, filename: str, outputs_dir=N
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run revised_framework_v2 experiments.")
+    parser = argparse.ArgumentParser(
+        description="Run the temperature-forecasting experiments."
+    )
     parser.add_argument(
         "--experiment",
         choices=["workflow", "baseline", "multivariate", "all"],
@@ -142,8 +144,12 @@ def main() -> None:
             configs, datasets=dataset_filter, outputs_dir=out_dir, logger=log,
         )
 
+    env_log_path = None
+    if out_dir is not None:
+        env_log_path = paths.ensure_dir(paths.resolve(out_dir) / "logs") / "environment.txt"
     log_path = write_environment_log(
-        extra={"experiment": args.experiment, "smoke": args.smoke, "dataset": args.dataset}
+        output_path=env_log_path,
+        extra={"experiment": args.experiment, "smoke": args.smoke, "dataset": args.dataset},
     )
     log.info("Environment log written to %s", log_path)
     log.info("Done.")

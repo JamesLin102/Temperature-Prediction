@@ -31,3 +31,6 @@ Thumbs.db
 
 # Local result backups (kept on disk, never pushed)
 _committed_backup_*.zip
+
+# Scratch output dir used by the --outputs-dir smoke check in the README
+_smoke_check/

@@ -1,7 +1,8 @@
 """Reproducible seeding.
 
-The original program used ``tf.random.set_seed(7)``. v2 uses PyTorch, so exact
-numeric parity is impossible — the goal is architecture + hyperparameter parity.
+The original 2024 implementation (git tag ``legacy-2024``) used
+``tf.random.set_seed(7)``. This project uses PyTorch, so exact numeric parity is
+impossible — the goal is architecture + hyperparameter parity.
 ``derive_fold_seed`` gives each (dataset, target, model, fold) run an independent,
 order-independent seed so results are reproducible regardless of execution order.
 """

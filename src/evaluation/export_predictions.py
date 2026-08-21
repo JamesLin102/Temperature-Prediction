@@ -1,4 +1,4 @@
-"""Per-fold prediction CSV + aggregated array export (spec sections 8.1, 8.2).
+"""Per-fold prediction CSV + aggregated array export.
 
 Per-fold CSVs go to ``<outputs>/predictions/<dataset>/<target>/<slug>/`` and
 aggregated legacy-named arrays to ``<outputs>/arrays/<dataset>/<target>/<slug>/``.

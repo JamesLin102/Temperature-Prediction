@@ -1,4 +1,9 @@
-"""Environment logging for reproducibility (spec section 9, step 13)."""
+"""Environment logging for reproducibility.
+
+Records the platform, Python version and the version of every package the
+experiments depend on, so a published result can be traced to the environment
+that produced it. Machine-specific paths are deliberately not recorded.
+"""
 from __future__ import annotations
 
 import importlib
@@ -43,7 +48,6 @@ def write_environment_log(output_path=None, extra: dict | None = None) -> str:
         f"Generated:  {datetime.now().isoformat(timespec='seconds')}",
         f"Platform:   {platform.platform()}",
         f"Python:     {sys.version.splitlines()[0]}",
-        f"Executable: {sys.executable}",
         "",
         "Package versions:",
     ]

@@ -1,4 +1,5 @@
-# Per-model hyperparameters. seed mirrors the original tf.random.set_seed(7).
+# Per-model hyperparameters. The seed mirrors the original 2024 implementation
+# (git tag legacy-2024), which used tf.random.set_seed(7).
 seed: 7
 
 models:
@@ -48,7 +49,8 @@ models:
     order: [4, 2, 0]
     trend: 'n'
 
-# CTGAN settings for the new-dataset asset generator (mirrors Original Programe/data_gan.py).
+# CTGAN settings, used by scripts/generate_seoul_kfold_assets.py and
+# scripts/regenerate_seattle_synthetic.py.
 ctgan:
   epochs: 500
   num_samples: 1400

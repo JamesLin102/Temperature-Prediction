@@ -1,4 +1,4 @@
-"""Abstract base class for every forecasting model in revised_framework_v2."""
+"""Abstract base class for every forecasting model in this project."""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

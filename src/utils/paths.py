@@ -1,13 +1,14 @@
 """Canonical path helpers.
 
-All runtime paths resolve INSIDE ``revised_framework_v2/``. Experiment code must
-never read external folders; only ``scripts/copy_required_assets.py`` may do so.
+Every path resolves relative to the repository root, so the project can be cloned
+anywhere and run without configuration. Experiment code never reads files from
+outside the repository.
 """
 from __future__ import annotations
 
 from pathlib import Path
 
-# paths.py lives at revised_framework_v2/src/utils/paths.py -> parents[2] is the project root.
+# paths.py lives at <repo>/src/utils/paths.py -> parents[2] is the repository root.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 CONFIGS_DIR = PROJECT_ROOT / "configs"
@@ -43,5 +44,5 @@ def assert_internal(path) -> Path:
     p = Path(path).resolve()
     root = PROJECT_ROOT.resolve()
     if p != root and root not in p.parents:
-        raise ValueError(f"Path escapes revised_framework_v2/: {p}")
+        raise ValueError(f"Path escapes the project root: {p}")
     return p

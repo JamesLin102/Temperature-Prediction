@@ -1,6 +1,6 @@
-# Experiment matrices (spec section 7).
+# Experiment matrices: the datasets, targets, workflows and models each experiment covers.
 
-# 7.1 Workflow comparison: datasets x targets x workflows.
+# Workflow comparison: datasets x targets x workflows.
 workflow_comparison:
   datasets: [seattle, seoul]
   targets: [temp_max, temp_min]
@@ -9,13 +9,13 @@ workflow_comparison:
     - TCN + CTGAN
     - TCN + CTGAN (processed)
 
-# 7.2 Baseline comparison: 7 models x datasets x targets. No CTGAN, no processed workflow.
+# Baseline comparison: 7 models x datasets x targets. No CTGAN, no processed workflow.
 baseline_comparison:
   datasets: [seattle, seoul]
   targets: [temp_max, temp_min]
   models: [arima, svr, random_forest, lightgbm, lstm, gru, tcn]
 
-# 7.3 Seattle-only multivariate extension. Feature lists are resolved by the runner from
+# Multivariate input comparison (Seattle only). Feature lists are resolved by the runner from
 # datasets.yaml (univariate = [target]; multivariate = multivariate_features;
 # multivariate_with_weather = multivariate_features + label-encoded weather).
 multivariate_comparison:
@@ -29,7 +29,7 @@ multivariate_comparison:
     - name: multivariate_with_weather
       use_weather: true
 
-# Overrides applied by smoke_test.py / --smoke for fast error-checking (not real training).
+# Overrides applied by --smoke for fast error-checking (not real training).
 smoke:
   n_splits: 1
   epochs: 1

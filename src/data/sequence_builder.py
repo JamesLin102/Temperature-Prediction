@@ -1,9 +1,10 @@
 """Sliding-window sequence construction.
 
-The off-by-one convention ``range(len - lookback - 1)`` matches the original
-``Original Programe/data_gan.py`` — it is why Seattle yields 1455 = 1461 - 5 - 1
-sequences. Every builder here uses the same convention so generated new-dataset
-assets and runtime-built multivariate sequences share the legacy ``(N, 6)`` format.
+The off-by-one convention ``range(len - lookback - 1)`` matches the original 2024
+implementation (``data_gan.py``, git tag ``legacy-2024``) — it is why Seattle
+yields 1455 = 1461 - 5 - 1 sequences. Every builder here uses the same
+convention, so generated Seoul assets and runtime-built multivariate sequences
+share the same ``(N, 6)`` format.
 """
 from __future__ import annotations
 

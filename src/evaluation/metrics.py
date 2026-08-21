@@ -1,4 +1,4 @@
-"""Regression metrics: MAE, RMSE, R2 (spec section 8.3)."""
+"""Regression metrics: MAE, RMSE, R2."""
 from __future__ import annotations
 
 import numpy as np

@@ -1,14 +1,15 @@
 """ARIMA baseline (statsmodels), fixed order, rolling one-step-ahead.
 
-The original program has no ARIMA reference. The fold ``.npy`` rows are
-overlapping lookback windows of a single contiguous series (Seattle) or pooled
-per-station windows (new_dataset). The training fold's underlying 1-D series is
+The original 2024 implementation has no ARIMA reference. The fold ``.npy`` rows
+are overlapping lookback windows of a single contiguous series (Seattle) or
+pooled per-station windows (Seoul). The training fold's underlying 1-D series is
 reconstructed as ``concatenate(X_train[0].flatten(), y_train)`` — exact for a
 contiguous KFold train fold, approximate at station boundaries for the pooled
-new_dataset (acceptable: new_dataset gets static checks only this pass).
+Seoul series.
 
-A fixed ``order`` (default ``(5, 1, 0)``) is used rather than an ``auto_arima``
-search to keep runs fast and deterministic. If statsmodels fails to fit or
+A fixed ``order`` is used rather than an ``auto_arima`` search, to keep runs fast
+and deterministic; the published results use ``order: [4, 2, 0]`` with
+``trend: 'n'`` from ``configs/models.yaml``. If statsmodels fails to fit or
 forecast a fold, the model falls back to a persistence forecast (predict the
 last observed lookback value) and logs a warning, so a run never crashes.
 """

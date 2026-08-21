@@ -7,7 +7,7 @@ import numpy as np
 
 from . import metrics
 
-# Workflow name -> legacy aggregated-array prefix (spec sections 2.4 and 8.1).
+# Workflow name -> aggregated-array filename prefix.
 _WORKFLOW_PREFIX = {
     "TCN": "T",
     "TCN + CTGAN": "TC",

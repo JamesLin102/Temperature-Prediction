@@ -1,4 +1,4 @@
-"""Summary table construction and export (spec section 8.3).
+"""Summary table construction and export.
 
 Each summary row is one (dataset, target, workflow/model[, setting]) combination
 with **pooled** MAE/RMSE/R2 — metrics computed once over every fold's predictions

@@ -1,19 +1,21 @@
-"""Generate new-dataset (Bias_correction_ucl) KFold .npy assets.
+"""Regenerate the Seoul (Bias_correction_ucl) KFold .npy fold assets.
 
-Mirrors Original Programe/data_gan.py, adapted for the multi-station CSV:
+The generated files are already committed under data/seoul/, so running this is
+only necessary to rebuild them from the raw CSV. It mirrors the original 2024
+implementation (data_gan.py, git tag legacy-2024), adapted for the
+multi-station CSV:
+
   * build station-safe lookback sequences (sequences never cross stations),
   * pool all stations, split with KFold(n_splits, shuffle=False),
-  * per fold save legacy (N, 6) arrays:
+  * per fold save (N, 6) arrays into data/seoul/<target>/:
       ori_training_data_<fold>.npy   (real training windows)
-      synthetic_data_<fold>.npy      (CTGAN samples, mirrors data_gan.py)
+      synthetic_data_<fold>.npy      (CTGAN samples)
       testing_data_<fold>.npy        (real test windows)
-    into data/new_dataset/<target>/.
 
-This script is WRITTEN but not run as part of the build pass. CTGAN training is
-heavy (~hours for 10 folds x 2 targets); run it deliberately when ready:
+CTGAN training is heavy (hours for 10 folds x 2 targets), so run it deliberately:
 
-    python scripts/generate_new_dataset_kfold_assets.py            # full
-    python scripts/generate_new_dataset_kfold_assets.py --smoke    # tiny/fast
+    python scripts/generate_seoul_kfold_assets.py            # full
+    python scripts/generate_seoul_kfold_assets.py --smoke    # tiny/fast check
 """
 from __future__ import annotations
 
@@ -38,8 +40,8 @@ from src.validation.kfold import generate_kfold_splits  # noqa: E402
 
 
 def generate(smoke: bool = False) -> None:
-    """Build and save the new-dataset KFold assets for both targets."""
-    log = get_logger("generate_new_dataset")
+    """Build and save the Seoul KFold assets for both targets."""
+    log = get_logger("generate_seoul_assets")
     configs = config.load_all_configs()
 
     seed = configs["models"].get("seed", 7)
@@ -106,7 +108,9 @@ def generate(smoke: bool = False) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate new_dataset KFold .npy assets.")
+    parser = argparse.ArgumentParser(
+        description="Regenerate the Seoul KFold .npy fold assets."
+    )
     parser.add_argument(
         "--smoke",
         action="store_true",

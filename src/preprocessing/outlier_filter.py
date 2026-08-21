@@ -1,6 +1,6 @@
 """Outlier removal for synthetic data (TCN + CTGAN (processed) workflow).
 
-Mirrors Original Programe/model.py: ``OneClassSVM().fit_predict`` on the full
+Mirrors the original 2024 implementation: ``OneClassSVM().fit_predict`` on the full
 ``(N, 6)`` synthetic array, then drop every row labelled ``-1``.
 """
 from __future__ import annotations

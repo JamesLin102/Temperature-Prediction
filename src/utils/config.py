@@ -1,4 +1,4 @@
-"""YAML config loading. Configs live in ``revised_framework_v2/configs/``."""
+"""YAML config loading. Configs live in ``configs/`` at the repository root."""
 from __future__ import annotations
 
 import yaml

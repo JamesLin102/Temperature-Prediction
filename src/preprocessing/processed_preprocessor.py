@@ -1,6 +1,6 @@
 """StandardScaler + Yeo-Johnson preprocessing for TCN + CTGAN (processed).
 
-Mirrors Original Programe/model.py: each of the six components
+Mirrors the original 2024 implementation: each of the six components
 {ori_x, ori_y, gan_x, gan_y, test_x, test_y} is ``StandardScaler.fit_transform``-ed
 and then ``PowerTransformer(method='yeo-johnson').fit_transform``-ed, with its own
 scaler/transformer pair. Inverse for predictions is Yeo-Johnson inverse then

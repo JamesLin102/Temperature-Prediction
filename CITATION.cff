@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite the paper below."
+title: "Temperature forecasting with CTGAN-based data augmentation and a temporal convolutional network"
+abstract: >-
+  Reference implementation of the CTGAN data-augmentation workflow (one-class SVM
+  outlier removal, standardisation, Yeo-Johnson transformation) combined with a
+  temporal convolutional network for next-day maximum and minimum temperature
+  forecasting, validated on the Seattle and Seoul weather datasets.
+type: software
+license: MIT
+repository-code: "https://github.com/JamesLin102/Temperature-Prediction"
+url: "https://jameslin102.github.io/Temperature-Prediction/"
+authors:
+  - family-names: Kuo
+    given-names: Ping-Huan
+    affiliation: National Cheng Kung University
+  - family-names: Lin
+    given-names: Yu-Sian
+    affiliation: National Cheng Kung University
+  - family-names: Chiu
+    given-names: Yu-Chih
+    affiliation: National Cheng Kung University
+preferred-citation:
+  type: article
+  title: >-
+    Enhancing Temperature Forecasting for Sustainable Energy Systems Using
+    CTGAN-Based Data Augmentation and Temporal Convolutional Networks
+  authors:
+    - family-names: Kuo
+      given-names: Ping-Huan
+    - family-names: Lin
+      given-names: Yu-Sian
+    - family-names: Chiu
+      given-names: Yu-Chih
+  journal: "Energy Reports"
+  year: 2026
+  notes: "In press"

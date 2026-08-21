@@ -1,176 +1,173 @@
-# revised_framework_v2
+# Temperature Forecasting with CTGAN Data Augmentation and a Temporal Convolutional Network
 
-Temperature prediction research framework with TCN + CTGAN data augmentation.
-Reproduces the original IEEE paper's 10-fold KFold validation and extends it with
-a second dataset (Seoul) and a 7-model baseline comparison.
+Reference implementation for the paper **"Enhancing Temperature Forecasting for Sustainable Energy
+Systems Using CTGAN-Based Data Augmentation and Temporal Convolutional Networks"**
+(Ping-Huan Kuo, Yu-Sian Lin, Yu-Chih Chiu — National Cheng Kung University), accepted at
+*Energy Reports* (Elsevier), 2026.
 
-A single command — `python scripts/run_experiments.py` — runs the experiments and
-then draws the full publication figure set, so the tables, arrays, and figures are
-all reproduced from one entry point.
+**Project page:** https://jameslin102.github.io/Temperature-Prediction/
+
+Next-day maximum and minimum temperature forecasting from a 5-day window, on two geographically
+distinct datasets (Seattle and Seoul). The contribution is not the TCN or the CTGAN, but the fixed
+preprocessing stage placed between them — one-class SVM outlier removal, standardisation and the
+Yeo–Johnson transformation — which aligns the synthetic distribution with the real one and turns
+CTGAN augmentation from harmful into helpful, without any CTGAN hyperparameter search.
+
+Everything needed to reproduce the published numbers is in this repository: the raw CSVs, the
+pre-split 10-fold `.npy` assets including the CTGAN synthetic folds, the result tables, the
+per-fold predictions and the publication figures.
 
 ---
 
-## Environment
-
-Use the `tempPrediction` conda environment:
+## Quickstart
 
 ```bash
-conda activate tempPrediction
-# Python 3.x | torch 2.5.1 (CPU) | sklearn | sdv | ctgan | lightgbm | statsmodels | pmdarima
+git clone https://github.com/JamesLin102/Temperature-Prediction.git
+cd Temperature-Prediction
+pip install -r requirements.txt
 ```
 
-All scripts below assume this environment is active.
+Check that everything is wired up (1 fold, 1 epoch, about a minute, writes nothing into the
+committed results):
 
----
-
-## Project Layout
-
-```
-revised_framework_v2/
-├── configs/
-│   ├── datasets.yaml       # dataset paths, lookback, n_splits
-│   ├── models.yaml         # hyperparameters for all 7 models + CTGAN
-│   └── experiments.yaml    # experiment matrices + smoke overrides
-├── data/
-│   ├── seattle/            # Seattle KFold .npy folds + seattle-weather.csv
-│   └── seoul/              # Seoul KFold .npy folds + Bias_correction_ucl.csv
-├── outputs/
-│   ├── arrays/             # aggregated y_true/y_pred numpy arrays per workflow
-│   ├── figures/            # publication figures (prediction, residual, distribution, temperature)
-│   ├── predictions/        # per-fold prediction CSVs
-│   ├── tables/             # experiment summary CSVs (pooled metrics) + distribution_metrics.csv
-│   └── logs/               # run logs + environment snapshot
-├── scripts/
-│   ├── run_experiments.py                    # main entry point (experiments + figures)
-│   ├── generate_new_dataset_kfold_assets.py  # Seoul .npy asset generator (heavy)
-│   ├── regenerate_seattle_synthetic.py       # re-run CTGAN on Seattle folds
-│   └── copy_required_assets.py               # one-time asset copy from source folders
-└── src/                    # library code (utils, data, models, experiments, evaluation, plotting)
+```bash
+python scripts/run_experiments.py --experiment all --smoke --outputs-dir _smoke_check
 ```
 
----
-
-## Running Experiments
-
-### Run all experiments + figures (workflow + baseline + multivariate)
+Reproduce the full result set (CPU only; the ARIMA baseline on the Seoul folds dominates the
+runtime):
 
 ```bash
 python scripts/run_experiments.py --experiment all
 ```
 
-This writes the summary tables, per-fold prediction CSVs, aggregated arrays, and —
-unless `--smoke` / `--no-figures` is passed — the full figure set under
-`outputs/figures/` plus `outputs/tables/distribution_metrics.csv`.
+That single command runs the three experiments and then draws the full figure set, overwriting
+`outputs/`. Training is deterministic — per-fold seeding plus a shared TCN cache — so repeated runs
+reproduce identical arrays, tables and figures.
 
-### Run a specific experiment
+Python 3.12 is recommended. Every experiment runs on CPU; no GPU is required.
 
-```bash
-python scripts/run_experiments.py --experiment workflow
-python scripts/run_experiments.py --experiment baseline
-python scripts/run_experiments.py --experiment multivariate   # Seattle only
+---
+
+## Repository layout
+
+```
+.
+├── configs/
+│   ├── datasets.yaml       # dataset paths, lookback, n_splits
+│   ├── models.yaml         # hyperparameters for all 7 models + CTGAN
+│   └── experiments.yaml    # experiment matrices + smoke overrides
+├── data/
+│   ├── seattle/            # seattle-weather.csv + 10-fold .npy assets per target
+│   └── seoul/              # Bias_correction_ucl.csv + 10-fold .npy assets per target
+├── outputs/                # committed results (see "Outputs" below)
+├── scripts/
+│   ├── run_experiments.py               # main entry point (experiments + figures)
+│   ├── generate_seoul_kfold_assets.py   # rebuild the Seoul .npy assets (heavy)
+│   └── regenerate_seattle_synthetic.py  # re-run CTGAN on the Seattle folds
+├── src/                    # library code (data, models, preprocessing, evaluation, plotting)
+└── docs/                   # the project page published via GitHub Pages
 ```
 
-### Restrict to one dataset
+Every path resolves relative to the repository root, so the project can be cloned anywhere and run
+without configuration.
 
-```bash
-python scripts/run_experiments.py --experiment all --dataset seattle
-python scripts/run_experiments.py --experiment all --dataset seoul
-```
+---
 
-When `--dataset` is passed, existing rows for the other dataset are preserved in
-the summary tables, and only that dataset's prediction figures are redrawn.
+## Data
 
-### Other flags
+| Dataset | Source | Records | Period |
+|---------|--------|---------|--------|
+| Seattle | [Kaggle — Weather Prediction](https://www.kaggle.com/datasets/ananthr1/weather-prediction/data) | 1,461 | 2012-01-01 – 2015-12-31, daily |
+| Seoul | [UCI — Bias correction of numerical prediction model temperature forecast](https://archive.ics.uci.edu/dataset/514/bias+correction+of+numerical+prediction+model+temperature+forecast) | 7,750 | Summers (Jun–Aug) 2013 – 2017, 26 stations |
 
-```bash
-python scripts/run_experiments.py --experiment all --smoke        # 1 fold / 1 epoch, no figures (code check)
-python scripts/run_experiments.py --experiment all --no-figures   # experiments only, skip figures
-python scripts/run_experiments.py --experiment all --outputs-dir /tmp/run1   # redirect every write
-```
+Both are redistributed here for reproducibility; please cite the original sources. The UCI dataset
+is released under CC BY 4.0 (Cho, D., Yoo, C., Im, J., Cha, D., 2020).
 
-`--smoke` applies the tiny overrides from `configs/experiments.yaml` for fast
-error-checking rather than real training. `--outputs-dir` sends tables, predictions,
-arrays, **and** figures under one directory — useful for verifying a run without
-touching the committed results.
-
-Training is deterministic (per-fold seeding + a shared TCN cache), so repeated runs
-reproduce identical arrays, tables, and figures.
+Only the target temperature variable feeds the model — adding the other weather variables lowered
+accuracy (see the multivariate experiment). Each `.npy` fold file is an `(N, 6)` array: five
+lookback values plus the next-day target.
 
 ---
 
 ## Experiments
 
-### 1. Workflow Comparison
-
-Compares three preprocessing + augmentation pipelines using TCN:
+### 1. Workflow comparison
 
 | Workflow | Description |
 |----------|-------------|
-| TCN | MinMax scaling (4 scalers), no augmentation |
-| TCN + CTGAN | MinMax scaling (6 scalers), CTGAN synthetic data appended |
-| TCN + CTGAN (processed) | StandardScaler + Yeo-Johnson (6 pairs), OneClassSVM-filtered synthetic data |
+| TCN | MinMax scaling, no augmentation |
+| TCN + CTGAN | MinMax scaling, raw CTGAN synthetic data appended |
+| TCN + CTGAN (processed) | One-class SVM filtering + StandardScaler + Yeo–Johnson on the synthetic data |
 
-Runs on: Seattle and Seoul · 10-fold KFold. The aggregated arrays it saves feed the
-prediction/residual figures for the best workflow (TCN + CTGAN processed).
+Runs on Seattle and Seoul, 10-fold KFold. The aggregated arrays it saves feed the prediction and
+residual figures for the best workflow.
 
-### 2. Baseline Comparison
+### 2. Baseline comparison
 
-Compares 7 models on the same KFold splits (no CTGAN augmentation):
+Seven models on identical splits with no augmentation: TCN, LSTM, GRU, SVR, Random Forest,
+LightGBM, ARIMA(4,2,0).
 
-| Model | Type |
-|-------|------|
-| TCN | Temporal Convolutional Network (PyTorch) |
-| LSTM | Long Short-Term Memory (PyTorch) |
-| GRU | Gated Recurrent Unit (PyTorch) |
-| SVR | Support Vector Regression |
-| Random Forest | sklearn RandomForestRegressor |
-| LightGBM | Gradient boosting |
-| ARIMA | ARIMA(4,2,0) via statsmodels |
+### 3. Multivariate input comparison (Seattle only)
 
-Runs on: Seattle and Seoul · 10-fold KFold.
+`univariate` (target column only) vs `multivariate` (temp_max, temp_min, precipitation, wind) vs
+`multivariate_with_weather` (plus the label-encoded weather category).
 
-### 3. Multivariate Comparison
+```bash
+python scripts/run_experiments.py --experiment workflow
+python scripts/run_experiments.py --experiment baseline
+python scripts/run_experiments.py --experiment multivariate   # Seattle only
+python scripts/run_experiments.py --experiment all --dataset seattle
+```
 
-Seattle-only experiment comparing feature configurations:
+When `--dataset` is passed, existing rows for the other dataset are preserved in the summary
+tables, and only that dataset's prediction figures are redrawn.
 
-| Setting | Features |
-|---------|----------|
-| univariate | target column only |
-| multivariate | temp_max, temp_min, precipitation, wind |
-| multivariate_with_weather | above + label-encoded weather category |
+Other flags:
 
----
-
-## Metrics: 10-fold pooled (aggregated)
-
-The summary tables report **pooled** metrics: every fold's test predictions are
-concatenated into one array and MAE / RMSE / R² are computed **once** over the whole
-set — not the mean of per-fold metrics. This matches the values annotated on the
-prediction figures. Each row carries `n_folds` and `n_samples` alongside the single
-`MAE`, `RMSE`, `R2` columns.
-
-> Pooled MAE is close to the old fold-mean (folds are near-equal size), but pooled
-> R²/RMSE differ noticeably because they are evaluated over the full temperature
-> range rather than averaged across narrow per-fold ranges.
+| Flag | Effect |
+|------|--------|
+| `--smoke` | 1 fold / 1 epoch, figures skipped — a fast error check, not real training |
+| `--no-figures` | Run the experiments only |
+| `--outputs-dir DIR` | Redirect every write (tables, predictions, arrays, figures, environment log) to `DIR` |
 
 ---
 
-## Outputs
+## Results
 
-After a full run, results are written to `outputs/`:
+Pooled 10-fold metrics of the proposed workflow, as published:
+
+| Dataset | Target | MAE | RMSE | R² |
+|---------|--------|-----|------|-----|
+| Seattle | maximum | 2.397 | 3.039 | 0.829 |
+| Seattle | minimum | 1.664 | 2.136 | 0.819 |
+| Seoul | maximum | 1.863 | 2.346 | 0.441 |
+| Seoul | minimum | 1.077 | 1.395 | 0.681 |
+
+The proposed workflow beats both the TCN baseline and unprocessed CTGAN augmentation in all four
+dataset–target combinations. Full tables, including the seven-model baseline comparison, are in
+`outputs/tables/` and on the [project page](https://jameslin102.github.io/Temperature-Prediction/).
+
+### Metrics are pooled, not averaged
+
+Every fold's test predictions are concatenated into one array and MAE / RMSE / R² are computed
+**once** over the whole set, rather than averaging per-fold metrics. Pooled MAE is close to the
+fold-mean because the folds are near-equal in size, but pooled R² and RMSE differ noticeably: they
+are evaluated over the full temperature range instead of narrow per-fold ranges. The values on the
+prediction figures use the same pooled definition.
+
+### Outputs
 
 | Path | Contents |
 |------|----------|
-| `outputs/tables/workflow_comparison_summary.csv` | Pooled MAE/RMSE/R² per workflow (10-fold aggregated) |
+| `outputs/tables/workflow_comparison_summary.csv` | Pooled MAE/RMSE/R² per workflow |
 | `outputs/tables/baseline_comparison_summary.csv` | Same, per baseline model |
-| `outputs/tables/multivariate_comparison_summary.csv` | Same, per multivariate setting |
-| `outputs/tables/distribution_metrics.csv` | KS / JSD / Wasserstein / mean / std of synthetic vs original across the 4 TCP preprocessing stages |
+| `outputs/tables/multivariate_comparison_summary.csv` | Same, per input configuration |
+| `outputs/tables/distribution_metrics.csv` | KS / JSD / Wasserstein / mean / std of synthetic vs original across the preprocessing stages |
 | `outputs/predictions/<dataset>/<target>/<slug>/fold_<N>_predictions.csv` | Per-fold y_true, y_pred, residual |
-| `outputs/arrays/<dataset>/<target>/<workflow>/` | Aggregated numpy arrays (all folds concatenated) |
-| `outputs/figures/predictions/<dataset>/t{max,min}_{pred,resi}.{png,pdf}` | Prediction scatter + residual plots (TCN + CTGAN processed) |
-| `outputs/figures/fig_dist_t{max,min}.{png,pdf}` | Synthetic-vs-original distribution across preprocessing stages |
-| `outputs/figures/temperature_over_time_{seattle,seoul}.{png,pdf}` | Daily temperature series |
-| `outputs/logs/environment.txt` | Package versions snapshot |
+| `outputs/arrays/<dataset>/<target>/<workflow>/` | All folds concatenated, as numpy arrays |
+| `outputs/figures/` | Prediction, residual, distribution and temperature figures (PNG + PDF) |
+| `outputs/logs/environment.txt` | Platform, Python and package versions of the published run |
 
 PDF figures are written without an embedded timestamp, so re-runs are byte-identical.
 
@@ -178,7 +175,7 @@ PDF figures are written without an embedded timestamp, so re-runs are byte-ident
 
 ## Configuration
 
-Edit `configs/models.yaml` to change model hyperparameters:
+Hyperparameters live in `configs/models.yaml`:
 
 ```yaml
 models:
@@ -191,23 +188,13 @@ models:
     batch_size: 100
     learning_rate: 0.001
 
-  arima:
-    order: [4, 2, 0]
-    trend: 'n'
-
-  svr:
-    kernel: rbf
-    C: 0.04
-    epsilon: 2.0
-    gamma: scale
-
 ctgan:
   epochs: 500
   num_samples: 1400
   enforce_min_max_values: true
 ```
 
-Edit `configs/datasets.yaml` to change lookback window or number of folds:
+and the split settings in `configs/datasets.yaml`:
 
 ```yaml
 lookback: 5
@@ -217,42 +204,38 @@ shuffle: false
 
 ---
 
-## Generating Seoul KFold Assets
+## Regenerating the fold assets
 
-The Seoul `.npy` fold files (already present in `data/seoul/`) were generated by:
-
-```bash
-python scripts/generate_new_dataset_kfold_assets.py
-```
-
-This is a heavy operation (~hours, runs CTGAN for each of 10 folds × 2 targets).
-Only re-run if you need to regenerate the assets from scratch.
-
-Use `--smoke` for a fast functional check (tiny CTGAN, 1 fold):
+The `.npy` fold files under `data/` are committed, so this is only needed to rebuild them from the
+raw CSVs.
 
 ```bash
-python scripts/generate_new_dataset_kfold_assets.py --smoke
+python scripts/generate_seoul_kfold_assets.py            # Seoul folds + CTGAN samples (hours)
+python scripts/generate_seoul_kfold_assets.py --smoke    # tiny/fast functional check
+python scripts/regenerate_seattle_synthetic.py           # re-run CTGAN on the Seattle folds
 ```
+
+CTGAN training is the expensive part: 10 folds × 2 targets × 500 epochs.
 
 ---
 
-## Utility Scripts
+## Citation
 
-**Regenerate Seattle synthetic folds:**
-```bash
-python scripts/regenerate_seattle_synthetic.py
+```bibtex
+@article{kuo2026enhancing,
+  title   = {Enhancing Temperature Forecasting for Sustainable Energy Systems Using
+             CTGAN-Based Data Augmentation and Temporal Convolutional Networks},
+  author  = {Kuo, Ping-Huan and Lin, Yu-Sian and Chiu, Yu-Chih},
+  journal = {Energy Reports},
+  year    = {2026},
+  note    = {In press}
+}
 ```
-Re-runs CTGAN on the existing Seattle `ori_training` folds and overwrites
-`synthetic_data_*.npy` in `data/seattle/`.
 
-**Copy legacy assets (one-time setup):**
-```bash
-python scripts/copy_required_assets.py
-```
-Copies the source CSVs and pre-split `.npy` folds into `data/`. This is the only
-script permitted to read from the sibling source folders; all runtime code reads
-only from `revised_framework_v2/`.
+The original 2024 implementation that this framework was rebuilt from is preserved at the git tag
+[`legacy-2024`](https://github.com/JamesLin102/Temperature-Prediction/tree/legacy-2024).
 
-> The distribution diagnostics and all publication figures are produced as part of
-> `run_experiments.py` (see `src/plotting/`), so there are no separate plotting
-> scripts to run.
+## License
+
+Code released under the [MIT License](LICENSE). The bundled datasets remain under the terms of
+their original sources.

@@ -1,8 +1,8 @@
-"""Experiment 7.2 — baseline comparison.
+"""Baseline comparison experiment.
 
 {ARIMA, SVR, RandomForest, LightGBM, LSTM, GRU, TCN} x datasets x targets. No
 CTGAN, no processed workflow — uses ``ori_training`` + ``testing`` folds only.
-A dataset with no assets (new_dataset this pass) is skipped gracefully.
+A dataset whose fold assets are missing is skipped gracefully.
 """
 from __future__ import annotations
 

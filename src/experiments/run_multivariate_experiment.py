@@ -1,4 +1,4 @@
-"""Experiment 7.3 — Seattle-only multivariate extension.
+"""Multivariate input experiment (Seattle only).
 
 The univariate setting uses pre-split legacy ``.npy`` fold assets (same as the
 workflow and baseline experiments) so its TCN results are identical to those

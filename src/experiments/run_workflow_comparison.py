@@ -1,4 +1,4 @@
-"""Experiment 7.1 — workflow comparison.
+"""Workflow comparison experiment.
 
 datasets x targets x {TCN, TCN + CTGAN, TCN + CTGAN (processed)}. Reads pre-split
 legacy ``.npy`` folds; a dataset with no assets is skipped gracefully. Per-fold

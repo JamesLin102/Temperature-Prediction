@@ -15,7 +15,7 @@ NEW_DATASET_TARGET_MAP = {"Next_Tmax": "temp_max", "Next_Tmin": "temp_min"}
 # --- Canonical targets shared downstream ------------------------------------
 TARGETS = ["temp_max", "temp_min"]
 
-# Legacy aggregated-array names (spec sections 2.4 and 8.1).
+# Aggregated-array filenames, kept identical to the original 2024 implementation.
 LEGACY_PLOT_ARRAY_NAMES = [
     "T_y_true_all",
     "T_y_pred_all",

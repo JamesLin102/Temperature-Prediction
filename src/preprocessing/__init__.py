@@ -1,1 +1,1 @@
-"""Preprocessing variants mirroring Original Programe/model.py."""
+"""Preprocessing variants mirroring the original 2024 implementation (tag legacy-2024)."""

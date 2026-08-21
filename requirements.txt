@@ -1,0 +1,20 @@
+# Pinned to the versions the published results were produced with
+# (see outputs/logs/environment.txt). Python 3.12 is recommended.
+#
+#   pip install -r requirements.txt
+#
+# torch installs the CPU build by default on most platforms; every experiment in
+# this repository runs on CPU. For a specific CUDA/CPU wheel see pytorch.org.
+
+numpy==2.3.1
+pandas==3.0.3
+scipy==1.16.0
+scikit-learn==1.8.0
+torch==2.11.0
+lightgbm==4.6.0
+statsmodels==0.14.6
+pmdarima==2.1.1
+sdv==1.36.1
+ctgan==0.12.1
+matplotlib==3.10.9
+PyYAML==6.0.3

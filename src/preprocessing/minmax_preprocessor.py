@@ -1,9 +1,10 @@
 """MinMax preprocessing for the TCN and TCN + CTGAN workflows.
 
-Mirrors Original Programe/model.py exactly, including its per-component scalers:
-each of {ori_x, ori_y, [gan_x, gan_y,] test_x, test_y} gets its OWN MinMaxScaler
-fit independently (the original even fits a scaler on the test set itself). This
-behaviour is preserved on purpose for faithfulness (spec sections 2 and 11).
+Mirrors ``model.py`` of the original 2024 implementation (git tag ``legacy-2024``)
+exactly, including its per-component scalers: each of
+{ori_x, ori_y, [gan_x, gan_y,] test_x, test_y} gets its OWN MinMaxScaler fit
+independently (the original even fits a scaler on the test set itself). The
+behaviour is preserved on purpose so the published numbers stay reproducible.
 
 Operates on legacy ``(N, 6)`` fold arrays: columns 0-4 are the 5 lookback
 values, column 5 is the target.

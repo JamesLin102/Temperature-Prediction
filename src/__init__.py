@@ -1,1 +1,1 @@
-"""revised_framework_v2 — self-contained temperature-forecasting research project."""
+"""Temperature forecasting with CTGAN data augmentation and a temporal convolutional network."""

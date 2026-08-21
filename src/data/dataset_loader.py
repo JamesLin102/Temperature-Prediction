@@ -1,7 +1,7 @@
-"""Data access layer. Reads ONLY from inside ``revised_framework_v2/``.
+"""Data access layer. Reads ONLY from inside the repository.
 
 Workflow / baseline experiments consume pre-split legacy ``.npy`` fold files;
-the multivariate experiment and the new-dataset generator read the raw CSVs.
+the multivariate experiment and the Seoul asset generator read the raw CSVs.
 """
 from __future__ import annotations
 
@@ -54,7 +54,7 @@ def load_legacy_fold(dataset: str, target: str, fold_id: int, kind: str) -> np.n
     if not path.exists():
         raise FileNotFoundError(
             f"Fold asset not found: {path}\n"
-            "For seoul, run scripts/generate_new_dataset_kfold_assets.py first."
+            "For seoul, run scripts/generate_seoul_kfold_assets.py first."
         )
     return np.load(path)
 
