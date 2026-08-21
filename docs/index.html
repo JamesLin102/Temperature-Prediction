@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enhancing Temperature Forecasting for Sustainable Energy Systems Using CTGAN-Based Data Augmentation and Temporal Convolutional Networks</title>
+  <meta name="description" content="A CTGAN data-augmentation workflow with one-class SVM outlier removal, standardisation and Yeo-Johnson transformation, paired with a temporal convolutional network for next-day maximum and minimum temperature forecasting on the Seattle and Seoul datasets.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127777;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<header class="hero">
+  <h1 class="title">Enhancing Temperature Forecasting for Sustainable Energy Systems Using CTGAN&#8209;Based Data Augmentation and Temporal Convolutional Networks</h1>
+
+  <p class="authors"><span class="author">Ping-Huan Kuo</span>, <span class="author">Yu-Sian Lin</span>, <span class="author">Yu-Chih Chiu</span></p>
+  <p class="affiliation">National Cheng Kung University</p>
+  <p class="venue">Accepted at <em>Energy Reports</em> (Elsevier), 2026</p>
+
+  <nav class="links">
+    <a class="btn disabled" href="#" title="DOI coming soon">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+      Paper
+    </a>
+    <a class="btn" href="https://github.com/JamesLin102/Temperature-Prediction">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0C17 5.2 18 5.5 18 5.5c.6 1.6.2 2.8.1 3.1.7.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6a11.5 11.5 0 0 0 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      Code
+    </a>
+    <a class="btn" href="#results">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4 20h3v-8H4v8zm6.5 0h3V4h-3v16zm6.5 0h3v-12h-3v12z"/></svg>
+      Results
+    </a>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Abstract</h2>
+    <p class="abstract">
+      Accurate temperature forecasting plays a critical role in energy management, building operation
+      optimization, and sustainable energy system planning. Reliable short-term temperature prediction can
+      significantly improve the operational efficiency of heating, ventilation, and air conditioning systems,
+      data centers, and smart energy infrastructures. This paper introduces a temperature prediction method
+      that uses multiple weather prediction datasets to establish models for the maximum and minimum
+      temperatures. A temporal convolutional network (TCN) is used for temperature prediction and a
+      conditional tabular generative adversarial network (CTGAN) for data augmentation. Given the challenge of
+      fitting CTGAN-generated synthetic data to the original data and the inefficiency of hyperparameter tuning
+      for CTGANs, this study adopts a series of data preprocessing methods &mdash; outlier removal with a
+      one-class support vector machine, dataset normalization, and the Yeo&ndash;Johnson transformation &mdash;
+      that bring the distribution of the synthesized data close to that of the original data. The proposed
+      TCN&nbsp;+&nbsp;CTGAN model with preprocessing consistently outperformed the TCN baseline and the
+      unprocessed augmentation variant across all experimental configurations. On the Seattle dataset, the
+      model achieved R<sup>2</sup> values of 0.829 and 0.819 for the maximum and minimum temperatures, with
+      corresponding RMSE values of 3.039 and 2.136. On the Seoul dataset, R<sup>2</sup> values of 0.441 and
+      0.681 were obtained, with RMSE values of 2.346 and 1.395.
+    </p>
+  </section>
+
+  <section>
+    <h2>Key Results</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number">R<sup>2</sup> 0.829</div>
+        <p>Seattle maximum temperature with the full workflow (MAE 2.397, RMSE 3.039), against 0.822 for the
+           TCN baseline and 0.801 for unprocessed CTGAN augmentation</p>
+      </div>
+      <div class="stat">
+        <div class="stat-number">&minus;89%</div>
+        <p>Wasserstein distance between synthetic and real Seattle maximum temperatures, 1.463 &rarr; 0.167
+           across the three preprocessing stages &mdash; standardisation alone accounts for 1.283 &rarr; 0.175</p>
+      </div>
+      <div class="stat">
+        <div class="stat-number">4 / 4</div>
+        <p>dataset&ndash;target combinations where the proposed workflow beats <em>both</em> the TCN baseline
+           and unprocessed augmentation, across two climates and 10-fold cross-validation</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="method">
+    <h2>Method</h2>
+    <p class="section-note">
+      CTGAN is fitted inside each cross-validation fold, so synthetic samples never see the held-out test data.
+      The contribution is the preprocessing stage between generation and training: it aligns the synthetic
+      distribution with the real one without any CTGAN hyperparameter search.
+    </p>
+
+    <figure class="diagram">
+      <div class="diagram-scroll">
+        <svg viewBox="0 0 960 384" role="img" aria-labelledby="dg-title dg-desc" preserveAspectRatio="xMidYMid meet">
+          <title id="dg-title">Pipeline of the proposed TCN + CTGAN workflow</title>
+          <desc id="dg-desc">Original data is split into ten folds; the nine training folds are augmented by a
+            per-fold CTGAN, the synthetic data then passes through one-class SVM outlier removal, standardisation
+            and the Yeo-Johnson transformation, and a temporal convolutional network is trained on the result.
+            The held-out fold is used for evaluation, and metrics are pooled over all ten folds.</desc>
+
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" class="dg-head"/>
+            </marker>
+          </defs>
+
+          <!-- 1. original data -->
+          <rect x="20" y="32" width="268" height="104" rx="12" class="dg-box"/>
+          <circle cx="44" cy="56" r="11" class="dg-badge"/>
+          <text x="44" y="60" class="dg-badge-t" text-anchor="middle">1</text>
+          <text x="64" y="61" class="dg-title">Original data</text>
+          <text x="40" y="88" class="dg-sub">Seattle &middot; 1,461 daily records</text>
+          <text x="40" y="108" class="dg-sub">Seoul &middot; 7,750 records, 26 stations</text>
+          <text x="40" y="128" class="dg-sub">5-day window &rarr; next-day value</text>
+
+          <!-- 2. cross-validation -->
+          <rect x="346" y="32" width="268" height="104" rx="12" class="dg-box"/>
+          <circle cx="370" cy="56" r="11" class="dg-badge"/>
+          <text x="370" y="60" class="dg-badge-t" text-anchor="middle">2</text>
+          <text x="390" y="61" class="dg-title">10-fold cross-validation</text>
+          <text x="366" y="88" class="dg-sub">9 folds train &middot; 1 fold held out</text>
+          <text x="366" y="108" class="dg-sub">repeated until every fold has</text>
+          <text x="366" y="128" class="dg-sub">served once as the test set</text>
+
+          <!-- 3. CTGAN -->
+          <rect x="672" y="32" width="268" height="104" rx="12" class="dg-box"/>
+          <circle cx="696" cy="56" r="11" class="dg-badge"/>
+          <text x="696" y="60" class="dg-badge-t" text-anchor="middle">3</text>
+          <text x="716" y="61" class="dg-title">CTGAN augmentation</text>
+          <text x="692" y="88" class="dg-sub">fitted per fold &middot; 500 epochs</text>
+          <text x="692" y="108" class="dg-sub">1,400 synthetic rows per fold</text>
+          <text x="692" y="128" class="dg-sub">min&ndash;max bounds enforced</text>
+
+          <!-- 4. preprocessing (the contribution) -->
+          <rect x="672" y="232" width="268" height="124" rx="12" class="dg-box dg-box-accent"/>
+          <circle cx="696" cy="256" r="11" class="dg-badge"/>
+          <text x="696" y="260" class="dg-badge-t" text-anchor="middle">4</text>
+          <text x="716" y="261" class="dg-title">Preprocessing</text>
+          <rect x="692" y="276" width="228" height="22" rx="11" class="dg-chip"/>
+          <text x="806" y="291" class="dg-chip-t" text-anchor="middle">One-class SVM outlier removal</text>
+          <rect x="692" y="303" width="228" height="22" rx="11" class="dg-chip"/>
+          <text x="806" y="318" class="dg-chip-t" text-anchor="middle">Standardisation</text>
+          <rect x="692" y="330" width="228" height="22" rx="11" class="dg-chip"/>
+          <text x="806" y="345" class="dg-chip-t" text-anchor="middle">Yeo&ndash;Johnson transformation</text>
+
+          <!-- 5. TCN -->
+          <rect x="346" y="232" width="268" height="124" rx="12" class="dg-box"/>
+          <circle cx="370" cy="256" r="11" class="dg-badge"/>
+          <text x="370" y="260" class="dg-badge-t" text-anchor="middle">5</text>
+          <text x="390" y="261" class="dg-title">TCN backbone</text>
+          <text x="366" y="287" class="dg-sub">temporal convolutional network</text>
+          <text x="366" y="305" class="dg-sub">4 dilated causal levels, d = 1, 2, 4, 8</text>
+          <text x="366" y="323" class="dg-sub">hidden 25 &middot; kernel 2 &middot; batch 10</text>
+          <text x="366" y="341" class="dg-sub">MSE loss &middot; Adam @ 1e-3</text>
+
+          <!-- 6. evaluation -->
+          <rect x="20" y="232" width="268" height="124" rx="12" class="dg-box"/>
+          <circle cx="44" cy="256" r="11" class="dg-badge"/>
+          <text x="44" y="260" class="dg-badge-t" text-anchor="middle">6</text>
+          <text x="64" y="261" class="dg-title">Pooled evaluation</text>
+          <text x="40" y="290" class="dg-sub">predictions from all 10 folds</text>
+          <text x="40" y="310" class="dg-sub">concatenated, then scored once</text>
+          <text x="40" y="330" class="dg-sub">MAE &middot; RMSE &middot; R&#178;</text>
+
+          <!-- connectors -->
+          <path d="M288 84 H338" class="dg-arrow"/>
+          <path d="M614 84 H664" class="dg-arrow"/>
+          <text x="639" y="72" class="dg-label" text-anchor="middle">train</text>
+          <path d="M806 136 V224" class="dg-arrow"/>
+          <path d="M672 294 H622" class="dg-arrow"/>
+          <path d="M346 294 H296" class="dg-arrow"/>
+          <path d="M480 136 V224" class="dg-arrow dg-dash"/>
+          <text x="494" y="176" class="dg-label">held-out fold</text>
+          <text x="494" y="194" class="dg-label">(evaluation only)</text>
+        </svg>
+      </div>
+      <figcaption>
+        The proposed workflow. Steps 1&ndash;3 run inside every cross-validation fold, so no synthetic sample is
+        ever derived from held-out data. Step 4 is the contribution of this work: three fixed transformations
+        that close the distributional gap between CTGAN output and real observations, replacing exhaustive
+        CTGAN hyperparameter tuning.
+      </figcaption>
+    </figure>
+  </section>
+
+  <section id="data">
+    <h2>Datasets</h2>
+    <p class="section-note">
+      Two publicly available meteorological datasets with different climates, scales, and temporal coverage.
+      Only the target temperature variable is fed to the model &mdash; adding further weather variables
+      degraded accuracy, as the input configuration table below shows.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Dataset</th>
+            <th scope="col">Source</th>
+            <th class="num" scope="col">Records</th>
+            <th scope="col">Period</th>
+            <th scope="col">Targets</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Seattle</th>
+            <td><a href="https://www.kaggle.com/datasets/ananthr1/weather-prediction/data">Kaggle &mdash; Weather Prediction</a></td>
+            <td class="num">1,461</td>
+            <td>2012-01-01 &ndash; 2015-12-31, daily</td>
+            <td>next-day T<sub>max</sub> / T<sub>min</sub></td>
+          </tr>
+          <tr>
+            <th scope="row">Seoul</th>
+            <td><a href="https://archive.ics.uci.edu/dataset/514/bias+correction+of+numerical+prediction+model+temperature+forecast">UCI &mdash; Bias correction of numerical prediction model temperature forecast</a></td>
+            <td class="num">7,750</td>
+            <td>Summers (Jun&ndash;Aug) 2013 &ndash; 2017, 26 stations</td>
+            <td>next-day T<sub>max</sub> / T<sub>min</sub></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="fig-grid fig-grid-spaced">
+      <figure>
+        <img src="assets/figures/temperature_seattle.png" alt="Daily maximum and minimum temperature of the Seattle dataset over time, 2012 to 2015.">
+        <figcaption>Seattle &mdash; four full years of daily temperature</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/figures/temperature_seoul.png" alt="Daily maximum and minimum temperature of the Seoul dataset over the summers of 2013 to 2017.">
+        <figcaption>Seoul &mdash; summer-only records, narrower temperature range</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Aligning Synthetic Data with Real Data</h2>
+    <p class="section-note">
+      Raw CTGAN output does not match the real distribution, and training on it makes forecasts worse. Each
+      preprocessing stage is scored with the Wasserstein distance between the synthetic and original
+      distributions &mdash; lower is closer.
+    </p>
+
+    <figure class="fig-wide">
+      <img src="assets/figures/dist_tmax.png" alt="Kernel density estimates of the maximum temperature distributions for Seattle and Seoul at four preprocessing stages: before outlier removal, after outlier removal, after standardisation, and after the Yeo-Johnson transformation.">
+      <figcaption>Maximum temperature &mdash; synthetic (dashed) against original (solid) at each stage</figcaption>
+    </figure>
+
+    <figure class="fig-wide">
+      <img src="assets/figures/dist_tmin.png" alt="Kernel density estimates of the minimum temperature distributions for Seattle and Seoul at four preprocessing stages: before outlier removal, after outlier removal, after standardisation, and after the Yeo-Johnson transformation.">
+      <figcaption>Minimum temperature &mdash; synthetic (dashed) against original (solid) at each stage</figcaption>
+    </figure>
+
+    <div class="table-wrap table-wrap-spaced">
+      <table>
+        <caption>Wasserstein distance between the original and CTGAN-synthesised data at each preprocessing stage.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Stage</th>
+            <th class="num" scope="col">Seattle T<sub>max</sub></th>
+            <th class="num" scope="col">Seattle T<sub>min</sub></th>
+            <th class="num" scope="col">Seoul T<sub>max</sub></th>
+            <th class="num" scope="col">Seoul T<sub>min</sub></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Before outlier removal</th><td class="num">1.463</td><td class="num">3.001</td><td class="num">0.964</td><td class="num">0.359</td></tr>
+          <tr><th scope="row">After outlier removal</th><td class="num">1.283</td><td class="num">2.956</td><td class="num">0.959</td><td class="num">0.419</td></tr>
+          <tr><th scope="row">After standardisation</th><td class="num">0.175</td><td class="num">0.595</td><td class="num">0.309</td><td class="num">0.172</td></tr>
+          <tr><th class="hl" scope="row">After Yeo&ndash;Johnson transformation</th><td class="hl num">0.167</td><td class="hl num">0.646</td><td class="hl num">0.323</td><td class="hl num">0.163</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">
+      Standardisation is by far the most impactful step. The Yeo&ndash;Johnson transformation optimises for
+      normality rather than for transport cost, so it can raise the distance slightly (Seattle T<sub>min</sub>,
+      Seoul T<sub>max</sub>) while still improving the shape alignment visible in the density plots.
+    </p>
+  </section>
+
+  <section id="results" class="wide">
+    <h2>Results</h2>
+    <p class="section-note">
+      All numbers are pooled over the 10 cross-validation folds: the test predictions of every fold are
+      concatenated and scored once, rather than averaging per-fold metrics.
+    </p>
+
+    <h3>Proposed workflow vs. baseline and unprocessed augmentation</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Dataset</th><th scope="col">Target</th><th scope="col">Model</th>
+            <th class="num" scope="col">MAE</th><th class="num" scope="col">RMSE</th><th class="num" scope="col">R<sup>2</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row" rowspan="6">Seattle</th><td rowspan="3">Maximum</td><td>TCN</td><td class="num">2.441</td><td class="num">3.098</td><td class="num">0.822</td></tr>
+          <tr><td>TCN + CTGAN (no preprocessing)</td><td class="num">2.581</td><td class="num">3.282</td><td class="num">0.801</td></tr>
+          <tr><td class="hl">TCN + CTGAN (with preprocessing)</td><td class="hl num">2.397</td><td class="hl num">3.039</td><td class="hl num">0.829</td></tr>
+          <tr class="group-start"><td rowspan="3">Minimum</td><td>TCN</td><td class="num">1.704</td><td class="num">2.167</td><td class="num">0.814</td></tr>
+          <tr><td>TCN + CTGAN (no preprocessing)</td><td class="num">1.857</td><td class="num">2.404</td><td class="num">0.771</td></tr>
+          <tr><td class="hl">TCN + CTGAN (with preprocessing)</td><td class="hl num">1.664</td><td class="hl num">2.136</td><td class="hl num">0.819</td></tr>
+          <tr class="group-start"><th scope="row" rowspan="6">Seoul</th><td rowspan="3">Maximum</td><td>TCN</td><td class="num">1.984</td><td class="num">2.459</td><td class="num">0.386</td></tr>
+          <tr><td>TCN + CTGAN (no preprocessing)</td><td class="num">1.991</td><td class="num">2.457</td><td class="num">0.387</td></tr>
+          <tr><td class="hl">TCN + CTGAN (with preprocessing)</td><td class="hl num">1.863</td><td class="hl num">2.346</td><td class="hl num">0.441</td></tr>
+          <tr class="group-start"><td rowspan="3">Minimum</td><td>TCN</td><td class="num">1.098</td><td class="num">1.424</td><td class="num">0.667</td></tr>
+          <tr><td>TCN + CTGAN (no preprocessing)</td><td class="num">1.130</td><td class="num">1.461</td><td class="num">0.650</td></tr>
+          <tr><td class="hl">TCN + CTGAN (with preprocessing)</td><td class="hl num">1.077</td><td class="hl num">1.395</td><td class="hl num">0.681</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">
+      Unprocessed synthetic data degrades every configuration; after preprocessing, the same synthetic data
+      improves every configuration.
+    </p>
+
+    <h3>Choosing the backbone &mdash; seven models under identical conditions</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Dataset</th><th scope="col">Target</th><th scope="col">Model</th>
+            <th class="num" scope="col">MAE</th><th class="num" scope="col">RMSE</th><th class="num" scope="col">R<sup>2</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row" rowspan="14">Seattle</th><td rowspan="7">Maximum</td><td class="hl">TCN</td><td class="hl num">2.441</td><td class="hl num">3.098</td><td class="hl num">0.822</td></tr>
+          <tr><td>ARIMA</td><td class="num">2.545</td><td class="num">3.284</td><td class="num">0.800</td></tr>
+          <tr><td>Random Forest</td><td class="num">2.589</td><td class="num">3.288</td><td class="num">0.800</td></tr>
+          <tr><td>LSTM</td><td class="num">3.025</td><td class="num">3.831</td><td class="num">0.728</td></tr>
+          <tr><td>GRU</td><td class="num">3.163</td><td class="num">3.977</td><td class="num">0.707</td></tr>
+          <tr><td>LightGBM</td><td class="num">3.243</td><td class="num">4.034</td><td class="num">0.699</td></tr>
+          <tr><td>SVM</td><td class="num">3.339</td><td class="num">4.346</td><td class="num">0.650</td></tr>
+          <tr class="group-start"><td rowspan="7">Minimum</td><td class="hl">TCN</td><td class="hl num">1.704</td><td class="hl num">2.167</td><td class="hl num">0.814</td></tr>
+          <tr><td>ARIMA</td><td class="num">1.748</td><td class="num">2.240</td><td class="num">0.801</td></tr>
+          <tr><td>Random Forest</td><td class="num">1.765</td><td class="num">2.244</td><td class="num">0.800</td></tr>
+          <tr><td>SVM</td><td class="num">2.211</td><td class="num">2.884</td><td class="num">0.670</td></tr>
+          <tr><td>GRU</td><td class="num">2.225</td><td class="num">2.855</td><td class="num">0.677</td></tr>
+          <tr><td>LightGBM</td><td class="num">2.226</td><td class="num">2.749</td><td class="num">0.700</td></tr>
+          <tr><td>LSTM</td><td class="num">2.290</td><td class="num">2.940</td><td class="num">0.657</td></tr>
+          <tr class="group-start"><th scope="row" rowspan="14">Seoul</th><td rowspan="7">Maximum</td><td class="hl">TCN</td><td class="hl num">1.984</td><td class="hl num">2.459</td><td class="hl num">0.386</td></tr>
+          <tr><td>SVM</td><td class="num">2.001</td><td class="num">2.476</td><td class="num">0.378</td></tr>
+          <tr><td>Random Forest</td><td class="num">2.028</td><td class="num">2.536</td><td class="num">0.347</td></tr>
+          <tr><td>GRU</td><td class="num">2.096</td><td class="num">2.585</td><td class="num">0.321</td></tr>
+          <tr><td>LightGBM</td><td class="num">2.120</td><td class="num">2.607</td><td class="num">0.310</td></tr>
+          <tr><td>LSTM</td><td class="num">2.121</td><td class="num">2.616</td><td class="num">0.305</td></tr>
+          <tr><td>ARIMA</td><td class="num">2.269</td><td class="num">2.955</td><td class="num">0.113</td></tr>
+          <tr class="group-start"><td rowspan="7">Minimum</td><td class="hl">TCN</td><td class="hl num">1.098</td><td class="hl num">1.424</td><td class="hl num">0.667</td></tr>
+          <tr><td>Random Forest</td><td class="num">1.196</td><td class="num">1.534</td><td class="num">0.614</td></tr>
+          <tr><td>SVM</td><td class="num">1.208</td><td class="num">1.556</td><td class="num">0.603</td></tr>
+          <tr><td>GRU</td><td class="num">1.218</td><td class="num">1.572</td><td class="num">0.595</td></tr>
+          <tr><td>ARIMA</td><td class="num">1.229</td><td class="num">1.615</td><td class="num">0.572</td></tr>
+          <tr><td>LSTM</td><td class="num">1.289</td><td class="num">1.665</td><td class="num">0.545</td></tr>
+          <tr><td>LightGBM</td><td class="num">1.311</td><td class="num">1.662</td><td class="num">0.547</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">
+      Ranked by MAE within each block, no augmentation applied. TCN gives the lowest MAE and the highest
+      R<sup>2</sup> in all four dataset&ndash;target combinations, which is why it is adopted as the backbone.
+    </p>
+
+    <h3>Input configuration &mdash; Seattle</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Target</th><th scope="col">Input</th>
+            <th class="num" scope="col">MAE</th><th class="num" scope="col">RMSE</th><th class="num" scope="col">R<sup>2</sup></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row" rowspan="3">Maximum</th><td class="hl">Only the max temperature</td><td class="hl num">2.441</td><td class="hl num">3.098</td><td class="hl num">0.822</td></tr>
+          <tr><td>All numerical data</td><td class="num">2.648</td><td class="num">3.373</td><td class="num">0.789</td></tr>
+          <tr><td>All (incl. weather type)</td><td class="num">2.826</td><td class="num">3.601</td><td class="num">0.760</td></tr>
+          <tr class="group-start"><th scope="row" rowspan="3">Minimum</th><td class="hl">Only the min temperature</td><td class="hl num">1.704</td><td class="hl num">2.167</td><td class="hl num">0.814</td></tr>
+          <tr><td>All numerical data</td><td class="num">1.719</td><td class="num">2.189</td><td class="num">0.810</td></tr>
+          <tr><td>All (incl. weather type)</td><td class="num">1.832</td><td class="num">2.355</td><td class="num">0.780</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">
+      Extra meteorological variables act as noise for next-day temperature forecasting, so the univariate
+      configuration is used throughout.
+    </p>
+  </section>
+
+  <section>
+    <h2>Prediction Quality</h2>
+    <p class="section-note">
+      Pooled predictions of the final TCN&nbsp;+&nbsp;CTGAN (processed) model across all ten folds.
+    </p>
+
+    <div class="tabs" role="tablist" aria-label="Dataset">
+      <button class="tab-btn" type="button" role="tab" id="tab-seattle" aria-controls="panel-seattle" aria-selected="true">Seattle</button>
+      <button class="tab-btn" type="button" role="tab" id="tab-seoul" aria-controls="panel-seoul" aria-selected="false">Seoul</button>
+    </div>
+
+    <div id="panel-seattle" role="tabpanel" aria-labelledby="tab-seattle">
+      <div class="fig-grid">
+        <figure>
+          <img src="assets/figures/seattle_tmax_pred.png" alt="Scatter plot of predicted versus actual Seattle maximum temperature.">
+          <figcaption><strong>Seattle &middot; maximum</strong> &mdash; MAE 2.397, RMSE 3.039, R<sup>2</sup> 0.829</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seattle_tmax_resi.png" alt="Residual plot with marginal distributions for the Seattle maximum temperature.">
+          <figcaption>Residuals, Seattle maximum temperature</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seattle_tmin_pred.png" alt="Scatter plot of predicted versus actual Seattle minimum temperature.">
+          <figcaption><strong>Seattle &middot; minimum</strong> &mdash; MAE 1.664, RMSE 2.136, R<sup>2</sup> 0.819</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seattle_tmin_resi.png" alt="Residual plot with marginal distributions for the Seattle minimum temperature.">
+          <figcaption>Residuals, Seattle minimum temperature</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div id="panel-seoul" role="tabpanel" aria-labelledby="tab-seoul">
+      <div class="fig-grid">
+        <figure>
+          <img src="assets/figures/seoul_tmax_pred.png" alt="Scatter plot of predicted versus actual Seoul maximum temperature.">
+          <figcaption><strong>Seoul &middot; maximum</strong> &mdash; MAE 1.863, RMSE 2.346, R<sup>2</sup> 0.441</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seoul_tmax_resi.png" alt="Residual plot with marginal distributions for the Seoul maximum temperature.">
+          <figcaption>Residuals, Seoul maximum temperature</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seoul_tmin_pred.png" alt="Scatter plot of predicted versus actual Seoul minimum temperature.">
+          <figcaption><strong>Seoul &middot; minimum</strong> &mdash; MAE 1.077, RMSE 1.395, R<sup>2</sup> 0.681</figcaption>
+        </figure>
+        <figure>
+          <img src="assets/figures/seoul_tmin_resi.png" alt="Residual plot with marginal distributions for the Seoul minimum temperature.">
+          <figcaption>Residuals, Seoul minimum temperature</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>BibTeX</h2>
+    <pre class="bibtex"><code>@article{kuo2026enhancing,
+  title   = {Enhancing Temperature Forecasting for Sustainable Energy Systems Using
+             CTGAN-Based Data Augmentation and Temporal Convolutional Networks},
+  author  = {Kuo, Ping-Huan and Lin, Yu-Sian and Chiu, Yu-Chih},
+  journal = {Energy Reports},
+  year    = {2026},
+  note    = {In press}
+}</code></pre>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 Ping-Huan Kuo, Yu-Sian Lin &amp; Yu-Chih Chiu &middot; National Cheng Kung University</p>
+</footer>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  if (!tabs.length) return;
+
+  function show(id) {
+    tabs.forEach(function (t) {
+      var selected = t.id === id;
+      t.setAttribute("aria-selected", selected ? "true" : "false");
+      t.tabIndex = selected ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !selected;
+    });
+  }
+
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { show(t.id); });
+    t.addEventListener("keydown", function (e) {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      var next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      show(next.id);
+      next.focus();
+    });
+  });
+
+  show(tabs[0].id);
+})();
+</script>
+
+</body>
+</html>
