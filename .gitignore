@@ -39,3 +39,8 @@ _smoke_check/
 # .npy fold assets are rebuilt locally by scripts/prepare_data.py (see data/README.md)
 data/**/*.csv
 data/**/*.npy
+
+# Per-fold predictions and aggregated arrays carry the datasets' target values,
+# so they are produced locally by scripts/run_experiments.py rather than shipped
+outputs/predictions/
+outputs/arrays/

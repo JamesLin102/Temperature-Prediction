@@ -68,7 +68,7 @@ Python 3.12 is recommended. Every experiment runs on CPU; no GPU is required.
 ├── data/                   # empty: you download the CSVs here, see data/README.md
 │   ├── seattle/            # -> seattle-weather.csv + 10-fold .npy assets per target
 │   └── seoul/              # -> Bias_correction_ucl.csv + 10-fold .npy assets per target
-├── outputs/                # committed results (see "Outputs" below)
+├── outputs/                # committed tables + figures (see "Outputs" below)
 ├── scripts/
 │   ├── prepare_data.py     # build the fold assets from the downloaded CSVs
 │   └── run_experiments.py  # main entry point (experiments + figures)
@@ -195,13 +195,14 @@ prediction figures use the same pooled definition.
 | `outputs/tables/baseline_comparison_summary.csv` | Same, per baseline model |
 | `outputs/tables/multivariate_comparison_summary.csv` | Same, per input configuration |
 | `outputs/tables/distribution_metrics.csv` | KS / JSD / Wasserstein / mean / std of synthetic vs original across the preprocessing stages |
-| `outputs/predictions/<dataset>/<target>/<slug>/fold_<N>_predictions.csv` | Per-fold y_true, y_pred, residual |
-| `outputs/arrays/<dataset>/<target>/<workflow>/` | All folds concatenated, as numpy arrays |
 | `outputs/figures/` | Prediction, residual, distribution and temperature figures (PNG + PDF) |
 | `outputs/logs/environment.txt` | Platform, Python and package versions of the published run |
 
-`outputs/` is committed, so the published results can be inspected without downloading the data or
-running anything.
+The summary tables and figures are committed, so the published results can be inspected without
+downloading the data or running anything. A run additionally writes
+`outputs/predictions/<dataset>/<target>/<slug>/fold_<N>_predictions.csv` (per-fold y_true, y_pred,
+residual) and `outputs/arrays/<dataset>/<target>/<workflow>/` (all folds concatenated as numpy
+arrays); those hold the datasets' target values, so they are generated locally rather than shipped.
 
 PDF figures are written without an embedded timestamp, so re-runs are byte-identical.
 
