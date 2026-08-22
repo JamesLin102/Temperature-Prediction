@@ -34,3 +34,8 @@ _committed_backup_*.zip
 
 # Scratch output dir used by the --outputs-dir smoke check in the README
 _smoke_check/
+
+# Datasets are not redistributed: the raw CSVs are downloaded by the user and the
+# .npy fold assets are rebuilt locally by scripts/prepare_data.py (see data/README.md)
+data/**/*.csv
+data/**/*.npy

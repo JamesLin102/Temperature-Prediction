@@ -13,9 +13,10 @@ preprocessing stage placed between them — one-class SVM outlier removal, stand
 Yeo–Johnson transformation — which aligns the synthetic distribution with the real one and turns
 CTGAN augmentation from harmful into helpful, without any CTGAN hyperparameter search.
 
-Everything needed to reproduce the published numbers is in this repository: the raw CSVs, the
-pre-split 10-fold `.npy` assets including the CTGAN synthetic folds, the result tables, the
-per-fold predictions and the publication figures.
+The two datasets belong to their original publishers and are **not** redistributed here. You
+download the CSVs yourself and one script rebuilds the exact fold assets used in the paper — see
+[Data setup](#data-setup). Everything else needed to check the results is in the repository: the
+result tables, the per-fold predictions, the aggregated arrays and the publication figures.
 
 ---
 
@@ -27,7 +28,14 @@ cd Temperature-Prediction
 pip install -r requirements.txt
 ```
 
-Check that everything is wired up (1 fold, 1 epoch, about a minute, writes nothing into the
+Download the two datasets into `data/` and build the fold assets — details in
+[Data setup](#data-setup):
+
+```bash
+python scripts/prepare_data.py --dataset all
+```
+
+Then check that everything is wired up (1 fold, 1 epoch, about a minute, writes nothing into the
 committed results):
 
 ```bash
@@ -57,14 +65,13 @@ Python 3.12 is recommended. Every experiment runs on CPU; no GPU is required.
 │   ├── datasets.yaml       # dataset paths, lookback, n_splits
 │   ├── models.yaml         # hyperparameters for all 7 models + CTGAN
 │   └── experiments.yaml    # experiment matrices + smoke overrides
-├── data/
-│   ├── seattle/            # seattle-weather.csv + 10-fold .npy assets per target
-│   └── seoul/              # Bias_correction_ucl.csv + 10-fold .npy assets per target
+├── data/                   # empty: you download the CSVs here, see data/README.md
+│   ├── seattle/            # -> seattle-weather.csv + 10-fold .npy assets per target
+│   └── seoul/              # -> Bias_correction_ucl.csv + 10-fold .npy assets per target
 ├── outputs/                # committed results (see "Outputs" below)
 ├── scripts/
-│   ├── run_experiments.py               # main entry point (experiments + figures)
-│   ├── generate_seoul_kfold_assets.py   # rebuild the Seoul .npy assets (heavy)
-│   └── regenerate_seattle_synthetic.py  # re-run CTGAN on the Seattle folds
+│   ├── prepare_data.py     # build the fold assets from the downloaded CSVs
+│   └── run_experiments.py  # main entry point (experiments + figures)
 ├── src/                    # library code (data, models, preprocessing, evaluation, plotting)
 └── docs/                   # the project page published via GitHub Pages
 ```
@@ -74,19 +81,43 @@ without configuration.
 
 ---
 
-## Data
+## Data setup
 
-| Dataset | Source | Records | Period |
-|---------|--------|---------|--------|
-| Seattle | [Kaggle — Weather Prediction](https://www.kaggle.com/datasets/ananthr1/weather-prediction/data) | 1,461 | 2012-01-01 – 2015-12-31, daily |
-| Seoul | [UCI — Bias correction of numerical prediction model temperature forecast](https://archive.ics.uci.edu/dataset/514/bias+correction+of+numerical+prediction+model+temperature+forecast) | 7,750 | Summers (Jun–Aug) 2013 – 2017, 26 stations |
+The datasets belong to their original publishers, so they are not redistributed here. Download
+them and save them under the exact paths below:
 
-Both are redistributed here for reproducibility; please cite the original sources. The UCI dataset
-is released under CC BY 4.0 (Cho, D., Yoo, C., Im, J., Cha, D., 2020).
+| Dataset | Download from | Save as | Records | Period |
+|---------|---------------|---------|---------|--------|
+| Seattle | [Kaggle — Weather Prediction](https://www.kaggle.com/datasets/ananthr1/weather-prediction/data) | `data/seattle/seattle-weather.csv` | 1,461 | 2012-01-01 – 2015-12-31, daily |
+| Seoul | [UCI — Bias correction of numerical prediction model temperature forecast](https://archive.ics.uci.edu/dataset/514/bias+correction+of+numerical+prediction+model+temperature+forecast) | `data/seoul/Bias_correction_ucl.csv` | 7,750 | Summers (Jun–Aug) 2013 – 2017, 26 stations |
+
+Then build the fold assets:
+
+```bash
+python scripts/prepare_data.py --dataset all          # both datasets, with CTGAN synthetic folds
+python scripts/prepare_data.py --dataset all --skip-synthetic   # real folds only, seconds
+python scripts/prepare_data.py --dataset seoul        # one dataset at a time
+```
+
+This writes `ori_training_data_<fold>.npy`, `testing_data_<fold>.npy` and
+`synthetic_data_<fold>.npy` for folds 1–10 into `data/<dataset>/<target>/`. Each row of an
+`(N, 6)` array is five lookback values plus the next-day target. Sequences follow the off-by-one
+convention of the original implementation and are split with `KFold(n_splits=10, shuffle=False)`.
+
+**The real folds regenerate bit-for-bit identically** to the ones behind the published results —
+that path is fully deterministic and was verified against the original arrays. **The synthetic
+folds do not:** CTGAN training is stochastic and version-dependent, so the workflow-comparison
+metrics land within CTGAN sampling noise of the published values rather than on them exactly. The
+baseline and multivariate experiments never touch the synthetic data, so `--skip-synthetic` is
+enough for those.
+
+Building the synthetic folds is the slow part — CTGAN trains 500 epochs per fold, 10 folds × 2
+targets × 2 datasets. `--smoke` swaps in tiny CTGAN settings for a fast functional check.
 
 Only the target temperature variable feeds the model — adding the other weather variables lowered
-accuracy (see the multivariate experiment). Each `.npy` fold file is an `(N, 6)` array: five
-lookback values plus the next-day target.
+accuracy (see the multivariate experiment). Please cite the original data sources; the UCI dataset
+is released under CC BY 4.0 (Cho, D., Yoo, C., Im, J., Cha, D., 2020). Full details, including the
+expected CSV contents, are in [`data/README.md`](data/README.md).
 
 ---
 
@@ -169,6 +200,9 @@ prediction figures use the same pooled definition.
 | `outputs/figures/` | Prediction, residual, distribution and temperature figures (PNG + PDF) |
 | `outputs/logs/environment.txt` | Platform, Python and package versions of the published run |
 
+`outputs/` is committed, so the published results can be inspected without downloading the data or
+running anything.
+
 PDF figures are written without an embedded timestamp, so re-runs are byte-identical.
 
 ---
@@ -204,18 +238,13 @@ shuffle: false
 
 ---
 
-## Regenerating the fold assets
+## Rebuilding only the synthetic folds
 
-The `.npy` fold files under `data/` are committed, so this is only needed to rebuild them from the
-raw CSVs.
+If you already have the real folds and only want to redraw the CTGAN samples:
 
 ```bash
-python scripts/generate_seoul_kfold_assets.py            # Seoul folds + CTGAN samples (hours)
-python scripts/generate_seoul_kfold_assets.py --smoke    # tiny/fast functional check
-python scripts/regenerate_seattle_synthetic.py           # re-run CTGAN on the Seattle folds
+python scripts/prepare_data.py --dataset all --synthetic-only
 ```
-
-CTGAN training is the expensive part: 10 folds × 2 targets × 500 epochs.
 
 ---
 

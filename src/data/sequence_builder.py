@@ -52,9 +52,8 @@ def build_station_safe_sequences(
     """Build univariate sequences per station (sorted by date), then pool them.
 
     Sequences never cross stations. Date gaps within a station are tolerated:
-    windows are taken over row order after sorting by date — the faithful reading
-    of the spec's "previous 5 consecutive records", matching how the legacy
-    generator treated the Seattle series.
+    windows are taken over row order after sorting by date, which is how the
+    original implementation treated the Seattle series.
     """
     x_parts, y_parts = [], []
     for _, station_df in df.groupby(station_col, sort=False):

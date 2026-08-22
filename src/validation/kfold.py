@@ -1,8 +1,8 @@
 """KFold validation — the validation method used throughout this project.
 
 Mirrors the original ``KFold(n_splits=10)`` with ``shuffle=False``. Used by the
-multivariate experiment and the Seoul asset generator; the workflow and baseline
-experiments instead read the pre-split ``.npy`` fold files directly by id.
+multivariate experiment and by ``scripts/prepare_data.py``; the workflow and
+baseline experiments instead read the pre-split ``.npy`` fold files by id.
 """
 from __future__ import annotations
 

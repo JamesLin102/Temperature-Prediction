@@ -1,7 +1,9 @@
 """Data access layer. Reads ONLY from inside the repository.
 
-Workflow / baseline experiments consume pre-split legacy ``.npy`` fold files;
-the multivariate experiment and the Seoul asset generator read the raw CSVs.
+Workflow / baseline experiments consume the pre-split ``.npy`` fold files;
+the multivariate experiment and ``scripts/prepare_data.py`` read the raw CSVs.
+Neither the CSVs nor the ``.npy`` assets ship with the repository — see
+``data/README.md`` for how to obtain and build them.
 """
 from __future__ import annotations
 
@@ -17,18 +19,24 @@ FOLD_KINDS = ("ori_training", "synthetic", "testing")
 
 # --- raw CSVs ---------------------------------------------------------------
 def load_seattle_csv() -> pd.DataFrame:
-    """Load ``data/seattle/seattle-weather.csv``."""
+    """Load ``data/seattle/seattle-weather.csv`` (downloaded by the user)."""
     path = paths.assert_internal(paths.SEATTLE_DIR / "seattle-weather.csv")
     if not path.exists():
-        raise FileNotFoundError(f"Seattle CSV not found: {path}")
+        raise FileNotFoundError(
+            f"Seattle CSV not found: {path}\n"
+            "The datasets are not redistributed with this repository; see data/README.md."
+        )
     return pd.read_csv(path)
 
 
 def load_seoul_csv() -> pd.DataFrame:
-    """Load ``data/seoul/Bias_correction_ucl.csv``."""
+    """Load ``data/seoul/Bias_correction_ucl.csv`` (downloaded by the user)."""
     path = paths.assert_internal(paths.SEOUL_DIR / "Bias_correction_ucl.csv")
     if not path.exists():
-        raise FileNotFoundError(f"Seoul CSV not found: {path}")
+        raise FileNotFoundError(
+            f"Seoul CSV not found: {path}\n"
+            "The datasets are not redistributed with this repository; see data/README.md."
+        )
     return pd.read_csv(path)
 
 
@@ -54,7 +62,9 @@ def load_legacy_fold(dataset: str, target: str, fold_id: int, kind: str) -> np.n
     if not path.exists():
         raise FileNotFoundError(
             f"Fold asset not found: {path}\n"
-            "For seoul, run scripts/generate_seoul_kfold_assets.py first."
+            "Download the raw CSVs and build the folds first:\n"
+            "    python scripts/prepare_data.py --dataset all\n"
+            "See data/README.md."
         )
     return np.load(path)
 

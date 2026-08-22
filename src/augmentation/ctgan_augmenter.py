@@ -5,9 +5,9 @@ Mirrors ``data_gan.py`` of the original 2024 implementation (git tag
 ``CTGANSynthesizer`` on it, sample synthetic rows, then inverse-transform back
 to the original range.
 
-Used only by the asset generators in ``scripts/`` — the synthetic ``.npy`` folds
-for both datasets are already committed under ``data/``. All SDV imports and training happen inside methods
-so importing this module never triggers a CTGAN run.
+Used only by ``scripts/prepare_data.py``, which builds the synthetic ``.npy``
+folds under ``data/``. All SDV imports and training happen inside methods, so
+importing this module never triggers a CTGAN run.
 """
 from __future__ import annotations
 

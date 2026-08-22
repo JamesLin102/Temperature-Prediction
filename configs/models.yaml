@@ -49,8 +49,7 @@ models:
     order: [4, 2, 0]
     trend: 'n'
 
-# CTGAN settings, used by scripts/generate_seoul_kfold_assets.py and
-# scripts/regenerate_seattle_synthetic.py.
+# CTGAN settings, used by scripts/prepare_data.py when it builds the synthetic folds.
 ctgan:
   epochs: 500
   num_samples: 1400
