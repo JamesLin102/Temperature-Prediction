@@ -48,7 +48,11 @@ def run(
     for dataset in ds_list:
         for target in tg_list:
             if not fold_assets_available(dataset, target, n_splits, kinds=("ori_training", "testing")):
-                log.warning("Skipping %s/%s: KFold .npy assets not generated.", dataset, target)
+                log.warning(
+                    "Skipping %s/%s: fold assets missing. Run: "
+                    "python scripts/prepare_data.py --dataset %s --skip-synthetic",
+                    dataset, target, dataset,
+                )
                 continue
 
             for model_name in model_list:

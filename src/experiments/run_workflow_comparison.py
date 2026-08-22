@@ -56,7 +56,11 @@ def run(
             if not fold_assets_available(
                 dataset, target, n_splits, kinds=("ori_training", "synthetic", "testing")
             ):
-                log.warning("Skipping %s/%s: KFold .npy assets not generated.", dataset, target)
+                log.warning(
+                    "Skipping %s/%s: fold assets missing (this experiment needs the "
+                    "synthetic folds too). Run: python scripts/prepare_data.py --dataset %s",
+                    dataset, target, dataset,
+                )
                 continue
 
             for workflow in workflows:
